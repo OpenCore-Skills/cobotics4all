@@ -1,0 +1,16 @@
+- id: tp1
+  title: Pallet Identification
+  startCondition: Robot enters warehouse zone
+  endCondition: Pallet coordinates locked
+  skills: 
+    - s3
+  description: Visual scanning of the environment to locate target pallets.
+
+- id: tp2
+  title: Precision Grasping
+  startCondition: Target coordinates received
+  endCondition: Object secured in gripper
+  skills: 
+    - s1
+    - s3
+  description: Approaching and securing the target object using force feedback.
