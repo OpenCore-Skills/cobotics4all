@@ -33,26 +33,18 @@
             background: #94a3b8; 
         }
     </style>
-
-    <!-- CRITICAL FIX: Import Map to ensure Single React Instance -->
-    <script type="importmap">
-    {
-        "imports": {
-            "react": "https://esm.sh/react@18.2.0",
-            "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-            "lucide-react": "https://esm.sh/lucide-react@0.292.0?deps=react@18.2.0,react-dom@18.2.0"
-        }
-    }
-    </script>
 </head>
 <body class="bg-slate-100 text-slate-900">
     <div id="root"></div>
 
     <!-- React App -->
     <script type="text/babel" data-type="module">
-        // Now we import from the "names" defined in the importmap above
-        import React, { useState } from 'react';
-        import { createRoot } from 'react-dom/client';
+        // --- CRITICAL FIX: Strict Dependency Locking ---
+        // We use direct URLs with the '?deps=react@18.2.0' flag on Lucide.
+        // This forces Lucide to use the EXACT SAME copy of React we import below.
+        
+        import React, { useState } from 'https://esm.sh/react@18.2.0';
+        import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
         import { 
             Layout, 
             Target, 
@@ -68,7 +60,7 @@
             BookOpen, 
             ChevronRight, 
             Cpu 
-        } from 'lucide-react';
+        } from 'https://esm.sh/lucide-react@0.292.0?deps=react@18.2.0';
 
         // --- Mock Data ---
         const initialSkills = [
