@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cobotics4All - Asset Umbrella</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Babel for JSX transformation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-900">
+    <div id="root"></div>
+
+    <!-- React App -->
+    <script type="text/babel" data-type="module">
+        import React, { useState } from 'https://esm.sh/react@18.2.0';
+        import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
+        import { 
+            Layout, 
+            Target, 
+            Bot, 
+            Layers, 
+            Network, 
+            Plus, 
+            ArrowRight, 
+            ExternalLink, 
+            CheckCircle, 
+            PlayCircle, 
+            StopCircle, 
+            BookOpen, 
+            ChevronRight, 
+            Cpu 
+        } from 'https://esm.sh/lucide-react@0.263.1';
+
+        // --- Mock Data ---
+        const initialSkills = [
+            { id: 's1', name: 'Grasp Object', url: 'https://opencore-skills.github.io/' },
+            { id: 's2', name: 'Navigation (SLAM)', url: 'https://opencore-skills.github.io/' },
+            { id: 's3', name: 'Visual Inspection', url: 'https://opencore-skills.github.io/' }
+        ];
+
+        const initialTaskPlots = [
+            { 
+                id: 'tp1', 
+                title: 'Pallet Identification', 
+                startCondition: 'Robot enters warehouse zone', 
+                endCondition: 'Pallet coordinates locked',
+                skills: ['s3'],
+                description: 'Visual scanning of the environment to locate target pallets.'
+            },
+            { 
+                id: 'tp2', 
+                title: 'Precision Grasping', 
+                startCondition: 'Target coordinates received', 
+                endCondition: 'Object secured in gripper',
+                skills: ['s1', 's3'],
+                description: 'Approaching and securing the target object using force feedback.'
+            }
+        ];
+
+        const initialMissions = [
+            {
+                id: 'm1',
+                title: 'Autonomous Inventory Management',
+                robotPlatform: 'Mobile Manipulator (AGV+Arm)',
+                description: 'Continuous patrol and organization of warehouse stock.',
+                taskPlotIds: ['tp1', 'tp2']
+            }
+        ];
+
+        const initialChallenges = [
+            {
+                id: 'c1',
+                title: 'Zero-Waste Logistics',
+                context: 'High-speed fulfillment center with mixed human-robot traffic.',
+                solutionGoal: 'Reduce misplaced inventory by 99% using autonomous sorting.',
+                missionIds: ['m1']
+            }
+        ];
+
+        // --- Components ---
+
+        const Navigation = ({ activeView, setActiveView }) => {
+            const navItems = [
+                { id: 'dashboard', label: 'Cobotics4All Dashboard', icon: Layout },
+                { id: 'challenges', label: 'Challenges & Journeys', icon: Target },
+                { id: 'missions', label: 'Missions', icon: Bot },
+                { id: 'taskplots', label: 'Task Plots', icon: Layers },
+            ];
+
+            return (
+                <div className="w-64 bg-slate-900 text-slate-300 flex flex-col h-screen sticky top-0 shadow-xl flex-shrink-0">
+                    <div className="p-6 flex items-center gap-3 text-white border-b border-slate-800">
+                        <Network className="w-8 h-8 text-teal-400" />
+                        <span className="text-xl font-bold tracking-wider">COBOTICS4ALL</span>
+                    </div>
+                    <div className="flex-1 py-6 space-y-2">
+                        {navItems.map((item) => (
+                            <button
+                                key={item.id}
+                                onClick={() => setActiveView(item.id)}
+                                className={`w-full flex items-center gap-3 px-6 py-3 transition-all duration-200 ${
+                                    activeView === item.id 
+                                        ? 'bg-teal-500/10 text-teal-400 border-r-4 border-teal-400' 
+                                        : 'hover:bg-slate-800 hover:text-white'
+                                }`}
+                            >
+                                <item.icon className="w-5 h-5" />
+                                <span className="font-medium">{item.label}</span>
+                            </button>
+                        ))}
+                    </div>
+                    <div className="p-6 border-t border-slate-800">
+                        <div className="text-xs text-slate-500 uppercase font-bold mb-2">External Resources</div>
+                        <a 
+                            href="https://opencore-skills.github.io/" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-sm text-slate-400 hover:text-teal-400 transition-colors"
+                        >
+                            <BookOpen className="w-4 h-4" />
+                            Skill Hub
+                            <ExternalLink className="w-3 h-3 ml-auto" />
+                        </a>
+                    </div>
+                </div>
+            );
+        };
+
+        const Card = ({ children, className = "" }) => (
+            <div className={`bg-white rounded-xl shadow-sm border border-slate-200 ${className}`}>
+                {children}
+            </div>
+        );
+
+        // --- Views ---
+
+        const Dashboard = ({ challenges, missions, taskPlots }) => (
+            <div className="space-y-8">
+                <header className="mb-8">
+                    <h1 className="text-3xl font-bold text-slate-800">System Overview</h1>
+                    <p className="text-slate-500">Asset hierarchy and relationships for Industry 5.0</p>
+                </header>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <Card className="p-6 border-l-4 border-indigo-500">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <div className="text-sm font-semibold text-indigo-500 uppercase tracking-wider">Challenges</div>
+                                <div className="text-4xl font-bold text-slate-800 mt-2">{challenges.length}</div>
+                                <p className="text-sm text-slate-500 mt-1">Active Journeys</p>
+                            </div>
+                            <Target className="w-8 h-8 text-indigo-200" />
+                        </div>
+                    </Card>
+                    <Card className="p-6 border-l-4 border-teal-500">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <div className="text-sm font-semibold text-teal-500 uppercase tracking-wider">Missions</div>
+                                <div className="text-4xl font-bold text-slate-800 mt-2">{missions.length}</div>
+                                <p className="text-sm text-slate-500 mt-1">Continuous Roles</p>
+                            </div>
+                            <Bot className="w-8 h-8 text-teal-200" />
+                        </div>
+                    </Card>
+                    <Card className="p-6 border-l-4 border-amber-500">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <div className="text-sm font-semibold text-amber-500 uppercase tracking-wider">Task Plots</div>
+                                <div className="text-4xl font-bold text-slate-800 mt-2">{taskPlots.length}</div>
+                                <p className="text-sm text-slate-500 mt-1">Reusable Segments</p>
+                            </div>
+                            <Layers className="w-8 h-8 text-amber-200" />
+                        </div>
+                    </Card>
+                </div>
+
+                <Card className="p-8">
+                    <h2 className="text-lg font-bold text-slate-800 mb-6">The Challenge-to-Solution Flow</h2>
+                    <div className="flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
+                        
+                        <div className="flex-1 p-4 bg-indigo-50 rounded-lg border border-indigo-100 w-full">
+                            <div className="flex items-center gap-2 mb-2 text-indigo-700 font-bold">
+                                <Target className="w-5 h-5" /> Challenge
+                            </div>
+                            <p className="text-sm text-indigo-600/80">Specific Industrial Problem & Context</p>
+                        </div>
+
+                        <ArrowRight className="text-slate-300 w-6 h-6 rotate-90 md:rotate-0" />
+
+                        <div className="flex-1 p-4 bg-teal-50 rounded-lg border border-teal-100 w-full">
+                            <div className="flex items-center gap-2 mb-2 text-teal-700 font-bold">
+                                <Bot className="w-5 h-5" /> Mission
+                            </div>
+                            <p className="text-sm text-teal-600/80">Endless Role of Platform / Physical AI</p>
+                        </div>
+
+                        <ArrowRight className="text-slate-300 w-6 h-6 rotate-90 md:rotate-0" />
+
+                        <div className="flex-1 p-4 bg-amber-50 rounded-lg border border-amber-100 w-full">
+                            <div className="flex items-center gap-2 mb-2 text-amber-700 font-bold">
+                                <Layers className="w-5 h-5" /> Task Plot
+                            </div>
+                            <p className="text-sm text-amber-600/80">Discrete Segment with Start/End</p>
+                        </div>
+
+                        <ArrowRight className="text-slate-300 w-6 h-6 rotate-90 md:rotate-0" />
+
+                        <div className="flex-1 p-4 bg-slate-100 rounded-lg border border-slate-200 w-full">
+                            <div className="flex items-center gap-2 mb-2 text-slate-700 font-bold">
+                                <Cpu className="w-5 h-5" /> Skill
+                            </div>
+                            <p className="text-sm text-slate-600/80">Atomic Capability (Skill Hub)</p>
+                        </div>
+
+                    </div>
+                </Card>
+            </div>
+        );
+
+        // --- Builder Components ---
+
+        const ChallengeBuilder = ({ challenges, setChallenges, missions }) => {
+            const [isCreating, setIsCreating] = useState(false);
+            const [newChallenge, setNewChallenge] = useState({
+                title: '',
+                context: '',
+                solutionGoal: '',
+                missionIds: []
+            });
+
+            const handleCreate = () => {
+                setChallenges([...challenges, { ...newChallenge, id: `c${Date.now()}` }]);
+                setIsCreating(false);
+                setNewChallenge({ title: '', context: '', solutionGoal: '', missionIds: [] });
+            };
+
+            const toggleMission = (mid) => {
+                setNewChallenge(prev => ({
+                    ...prev,
+                    missionIds: prev.missionIds.includes(mid) 
+                        ? prev.missionIds.filter(id => id !== mid)
+                        : [...prev.missionIds, mid]
+                }));
+            };
+
+            return (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-2xl font-bold text-slate-800">Challenge Journeys</h2>
+                        <button 
+                            onClick={() => setIsCreating(!isCreating)}
+                            className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+                        >
+                            <Plus className="w-4 h-4" /> New Challenge
+                        </button>
+                    </div>
+
+                    {isCreating && (
+                        <Card className="p-6 bg-slate-50 border-indigo-200">
+                            <h3 className="text-lg font-semibold mb-4 text-indigo-900">Define New Journey</h3>
+                            <div className="grid gap-4">
+                                <input 
+                                    placeholder="Challenge Title (e.g., Warehouse Safety)" 
+                                    className="w-full p-3 rounded border border-slate-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                                    value={newChallenge.title}
+                                    onChange={e => setNewChallenge({...newChallenge, title: e.target.value})}
+                                />
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <textarea 
+                                        placeholder="Context (The Situation)" 
+                                        className="w-full p-3 rounded border border-slate-300 h-24"
+                                        value={newChallenge.context}
+                                        onChange={e => setNewChallenge({...newChallenge, context: e.target.value})}
+                                    />
+                                    <textarea 
+                                        placeholder="Target Solution (The Goal)" 
+                                        className="w-full p-3 rounded border border-slate-300 h-24"
+                                        value={newChallenge.solutionGoal}
+                                        onChange={e => setNewChallenge({...newChallenge, solutionGoal: e.target.value})}
+                                    />
+                                </div>
+                                
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Assign Missions (The 'How')</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {missions.map(m => (
+                                            <button
+                                                key={m.id}
+                                                onClick={() => toggleMission(m.id)}
+                                                className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
+                                                    newChallenge.missionIds.includes(m.id)
+                                                        ? 'bg-teal-100 border-teal-300 text-teal-800'
+                                                        : 'bg-white border-slate-200 text-slate-600 hover:border-teal-300'
+                                                }`}
+                                            >
+                                                {m.title}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-end gap-3 mt-4">
+                                    <button onClick={() => setIsCreating(false)} className="text-slate-500 hover:text-slate-700">Cancel</button>
+                                    <button onClick={handleCreate} className="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700">Create Template</button>
+                                </div>
+                            </div>
+                        </Card>
+                    )}
+
+                    <div className="grid gap-6">
+                        {challenges.map(c => (
+                            <Card key={c.id} className="overflow-hidden">
+                                <div className="bg-slate-50 p-4 border-b border-slate-200 flex justify-between items-start">
+                                    <div>
+                                        <h3 className="text-lg font-bold text-slate-800">{c.title}</h3>
+                                        <span className="text-xs font-mono text-slate-400 uppercase">ID: {c.id}</span>
+                                    </div>
+                                    <Target className="text-indigo-400 w-6 h-6" />
+                                </div>
+                                <div className="p-6 grid md:grid-cols-2 gap-8">
+                                    <div className="space-y-4">
+                                        <div>
+                                            <h4 className="text-xs font-bold text-slate-400 uppercase mb-1">Context</h4>
+                                            <p className="text-slate-700">{c.context}</p>
+                                        </div>
+                                        <div>
+                                            <h4 className="text-xs font-bold text-slate-400 uppercase mb-1">Target Solution</h4>
+                                            <p className="text-slate-700">{c.solutionGoal}</p>
+                                        </div>
+                                    </div>
+                                    <div className="bg-indigo-50/50 rounded-lg p-4 border border-indigo-100">
+                                        <h4 className="text-sm font-bold text-indigo-900 mb-3 flex items-center gap-2">
+                                            <Bot className="w-4 h-4" /> Active Missions
+                                        </h4>
+                                        <div className="space-y-2">
+                                            {c.missionIds.map(mid => {
+                                                const mission = missions.find(m => m.id === mid);
+                                                return mission ? (
+                                                    <div key={mid} className="bg-white p-2 rounded border border-indigo-100 text-sm text-indigo-800 shadow-sm flex items-center justify-between">
+                                                        <span>{mission.title}</span>
+                                                        <ChevronRight className="w-4 h-4 text-indigo-300" />
+                                                    </div>
+                                                ) : null;
+                                            })}
+                                            {c.missionIds.length === 0 && <div className="text-sm text-slate-400 italic">No missions assigned yet.</div>}
+                                        </div>
+                                    </div>
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const MissionBuilder = ({ missions, setMissions, taskPlots }) => {
+            const [isCreating, setIsCreating] = useState(false);
+            const [newMission, setNewMission] = useState({
+                title: '',
+                robotPlatform: '',
+                description: '',
+                taskPlotIds: []
+            });
+
+            const handleCreate = () => {
+                setMissions([...missions, { ...newMission, id: `m${Date.now()}` }]);
+                setIsCreating(false);
+                setNewMission({ title: '', robotPlatform: '', description: '', taskPlotIds: [] });
+            };
+
+            const toggleTaskPlot = (tid) => {
+                setNewMission(prev => ({
+                    ...prev,
+                    taskPlotIds: prev.taskPlotIds.includes(tid)
+                        ? prev.taskPlotIds.filter(id => id !== tid)
+                        : [...prev.taskPlotIds, tid]
+                }));
+            };
+
+            return (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h2 className="text-2xl font-bold text-slate-800">Missions</h2>
+                            <p className="text-sm text-slate-500">Endless roles for physical AI</p>
+                        </div>
+                        <button 
+                            onClick={() => setIsCreating(!isCreating)}
+                            className="flex items-center gap-2 bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors"
+                        >
+                            <Plus className="w-4 h-4" /> New Mission
+                        </button>
+                    </div>
+
+                    {isCreating && (
+                        <Card className="p-6 bg-slate-50 border-teal-200">
+                            <h3 className="text-lg font-semibold mb-4 text-teal-900">Define Mission Profile</h3>
+                            <div className="grid gap-4">
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <input 
+                                        placeholder="Mission Title" 
+                                        className="w-full p-3 rounded border border-slate-300"
+                                        value={newMission.title}
+                                        onChange={e => setNewMission({...newMission, title: e.target.value})}
+                                    />
+                                    <input 
+                                        placeholder="Robotic Platform (e.g. Spot, UR5)" 
+                                        className="w-full p-3 rounded border border-slate-300"
+                                        value={newMission.robotPlatform}
+                                        onChange={e => setNewMission({...newMission, robotPlatform: e.target.value})}
+                                    />
+                                </div>
+                                <textarea 
+                                    placeholder="Mission Description (Continuous objective)" 
+                                    className="w-full p-3 rounded border border-slate-300 h-20"
+                                    value={newMission.description}
+                                    onChange={e => setNewMission({...newMission, description: e.target.value})}
+                                />
+
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Compose with Task Plots (Segments)</label>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border border-slate-200 rounded bg-white">
+                                        {taskPlots.map(tp => (
+                                            <div 
+                                                key={tp.id}
+                                                onClick={() => toggleTaskPlot(tp.id)}
+                                                className={`p-2 rounded cursor-pointer border transition-all flex items-center gap-2 ${
+                                                    newMission.taskPlotIds.includes(tp.id)
+                                                        ? 'bg-amber-50 border-amber-300 text-amber-900'
+                                                        : 'hover:bg-slate-50 border-transparent'
+                                                }`}
+                                            >
+                                                <div className={`w-4 h-4 rounded border flex items-center justify-center ${
+                                                    newMission.taskPlotIds.includes(tp.id) ? 'bg-amber-500 border-amber-500' : 'border-slate-300'
+                                                }`}>
+                                                    {newMission.taskPlotIds.includes(tp.id) && <CheckCircle className="w-3 h-3 text-white" />}
+                                                </div>
+                                                <span className="text-sm">{tp.title}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-end gap-3 mt-4">
+                                    <button onClick={() => setIsCreating(false)} className="text-slate-500">Cancel</button>
+                                    <button onClick={handleCreate} className="bg-teal-600 text-white px-6 py-2 rounded">Create Mission</button>
+                                </div>
+                            </div>
+                        </Card>
+                    )}
+
+                    <div className="grid gap-4">
+                        {missions.map(m => (
+                            <Card key={m.id} className="p-6 flex flex-col md:flex-row gap-6">
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Bot className="text-teal-500 w-5 h-5" />
+                                        <h3 className="text-lg font-bold text-slate-800">{m.title}</h3>
+                                    </div>
+                                    <div className="text-sm text-slate-500 mb-4 flex items-center gap-2">
+                                        <Cpu className="w-4 h-4" /> Platform: {m.robotPlatform}
+                                    </div>
+                                    <p className="text-slate-700 text-sm">{m.description}</p>
+                                </div>
+                                <div className="w-full md:w-1/3 bg-slate-50 rounded-lg p-4 border border-slate-200">
+                                    <h4 className="text-xs font-bold text-slate-500 uppercase mb-3">Task Plot Sequence</h4>
+                                    <ul className="space-y-2">
+                                        {m.taskPlotIds.map((tid, idx) => {
+                                            const plot = taskPlots.find(t => t.id === tid);
+                                            return (
+                                                <li key={tid} className="text-sm bg-white p-2 rounded border border-slate-200 shadow-sm flex gap-2 items-center">
+                                                    <span className="w-5 h-5 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center text-xs font-bold">{idx + 1}</span>
+                                                    {plot ? plot.title : 'Unknown Plot'}
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const TaskPlotBuilder = ({ taskPlots, setTaskPlots }) => {
+            const [isCreating, setIsCreating] = useState(false);
+            const [newPlot, setNewPlot] = useState({
+                title: '',
+                startCondition: '',
+                endCondition: '',
+                description: '',
+                skills: []
+            });
+
+            const handleCreate = () => {
+                setTaskPlots([...taskPlots, { ...newPlot, id: `tp${Date.now()}` }]);
+                setIsCreating(false);
+                setNewPlot({ title: '', startCondition: '', endCondition: '', description: '', skills: [] });
+            };
+
+            const toggleSkill = (sid) => {
+                setNewPlot(prev => ({
+                    ...prev,
+                    skills: prev.skills.includes(sid)
+                        ? prev.skills.filter(id => id !== sid)
+                        : [...prev.skills, sid]
+                }));
+            };
+
+            return (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h2 className="text-2xl font-bold text-slate-800">Task Plots</h2>
+                            <p className="text-sm text-slate-500">Discrete segments with start/end conditions</p>
+                        </div>
+                        <button 
+                            onClick={() => setIsCreating(!isCreating)}
+                            className="flex items-center gap-2 bg-amber-600 text-white px-4 py-2 rounded-lg hover:bg-amber-700 transition-colors"
+                        >
+                            <Plus className="w-4 h-4" /> New Task Plot
+                        </button>
+                    </div>
+
+                    {isCreating && (
+                        <Card className="p-6 bg-slate-50 border-amber-200">
+                            <h3 className="text-lg font-semibold mb-4 text-amber-900">Architect Task Plot</h3>
+                            <div className="grid gap-4">
+                                <input 
+                                    placeholder="Plot Title (e.g. Identify Object)" 
+                                    className="w-full p-3 rounded border border-slate-300"
+                                    value={newPlot.title}
+                                    onChange={e => setNewPlot({...newPlot, title: e.target.value})}
+                                />
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-xs font-bold text-green-600 uppercase mb-1 flex items-center gap-1"><PlayCircle className="w-3 h-3"/> Start Condition</label>
+                                        <input 
+                                            placeholder="Trigger event..." 
+                                            className="w-full p-2 rounded border border-slate-300 text-sm"
+                                            value={newPlot.startCondition}
+                                            onChange={e => setNewPlot({...newPlot, startCondition: e.target.value})}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-bold text-red-600 uppercase mb-1 flex items-center gap-1"><StopCircle className="w-3 h-3"/> End Condition</label>
+                                        <input 
+                                            placeholder="Success state..." 
+                                            className="w-full p-2 rounded border border-slate-300 text-sm"
+                                            value={newPlot.endCondition}
+                                            onChange={e => setNewPlot({...newPlot, endCondition: e.target.value})}
+                                        />
+                                    </div>
+                                </div>
+                                <textarea 
+                                    placeholder="Description of the segment..." 
+                                    className="w-full p-3 rounded border border-slate-300 h-20"
+                                    value={newPlot.description}
+                                    onChange={e => setNewPlot({...newPlot, description: e.target.value})}
+                                />
+
+                                <div className="bg-white p-3 rounded border border-slate-200">
+                                    <label className="block text-sm font-medium text-slate-700 mb-2 flex items-center justify-between">
+                                        <span>Required Skills (Capabilities)</span>
+                                        <a href="https://opencore-skills.github.io/" target="_blank" className="text-xs text-indigo-600 flex items-center hover:underline">
+                                            Open Skill Hub <ExternalLink className="w-3 h-3 ml-1"/>
+                                        </a>
+                                    </label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {initialSkills.map(skill => (
+                                            <button
+                                                key={skill.id}
+                                                onClick={() => toggleSkill(skill.id)}
+                                                className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                                                    newPlot.skills.includes(skill.id)
+                                                        ? 'bg-slate-800 text-white'
+                                                        : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                                                }`}
+                                            >
+                                                {skill.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-end gap-3 mt-4">
+                                    <button onClick={() => setIsCreating(false)} className="text-slate-500">Cancel</button>
+                                    <button onClick={handleCreate} className="bg-amber-600 text-white px-6 py-2 rounded">Save Plot</button>
+                                </div>
+                            </div>
+                        </Card>
+                    )}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {taskPlots.map(tp => (
+                            <Card key={tp.id} className="p-5 relative overflow-hidden">
+                                <div className="absolute top-0 left-0 w-1 h-full bg-amber-400"></div>
+                                <div className="flex justify-between items-start mb-3 pl-2">
+                                    <h3 className="font-bold text-slate-800">{tp.title}</h3>
+                                    <Layers className="text-amber-300 w-5 h-5" />
+                                </div>
+                                <div className="pl-2 space-y-3">
+                                    <p className="text-sm text-slate-600">{tp.description}</p>
+                                    
+                                    <div className="flex items-center gap-2 text-xs">
+                                        <span className="bg-green-100 text-green-800 px-2 py-1 rounded flex items-center gap-1">
+                                            <PlayCircle className="w-3 h-3"/> {tp.startCondition}
+                                        </span>
+                                        <ArrowRight className="w-3 h-3 text-slate-300" />
+                                        <span className="bg-red-100 text-red-800 px-2 py-1 rounded flex items-center gap-1">
+                                            <StopCircle className="w-3 h-3"/> {tp.endCondition}
+                                        </span>
+                                    </div>
+
+                                    <div className="pt-3 border-t border-slate-100">
+                                        <div className="text-xs font-bold text-slate-400 uppercase mb-2">Linked Skills</div>
+                                        <div className="flex flex-wrap gap-1">
+                                            {tp.skills.map(sid => {
+                                                const skill = initialSkills.find(s => s.id === sid);
+                                                return skill ? (
+                                                    <a 
+                                                        key={sid} 
+                                                        href={skill.url}
+                                                        target="_blank"
+                                                        className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded hover:bg-indigo-50 hover:text-indigo-600 transition-colors cursor-pointer flex items-center gap-1"
+                                                    >
+                                                        {skill.name} <ExternalLink className="w-2 h-2 opacity-50"/>
+                                                    </a>
+                                                ) : null;
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Main App ---
+
+        function App() {
+            const [activeView, setActiveView] = useState('dashboard');
+            const [challenges, setChallenges] = useState(initialChallenges);
+            const [missions, setMissions] = useState(initialMissions);
+            const [taskPlots, setTaskPlots] = useState(initialTaskPlots);
+
+            const renderContent = () => {
+                switch (activeView) {
+                    case 'dashboard':
+                        return <Dashboard challenges={challenges} missions={missions} taskPlots={taskPlots} />;
+                    case 'challenges':
+                        return <ChallengeBuilder challenges={challenges} setChallenges={setChallenges} missions={missions} />;
+                    case 'missions':
+                        return <MissionBuilder missions={missions} setMissions={setMissions} taskPlots={taskPlots} />;
+                    case 'taskplots':
+                        return <TaskPlotBuilder taskPlots={taskPlots} setTaskPlots={setTaskPlots} />;
+                    default:
+                        return <Dashboard challenges={challenges} missions={missions} taskPlots={taskPlots} />;
+                }
+            };
+
+            return (
+                <div className="flex min-h-screen bg-slate-100 font-sans text-slate-900">
+                    <Navigation activeView={activeView} setActiveView={setActiveView} />
+                    <main className="flex-1 p-8 overflow-y-auto h-screen">
+                        <div className="max-w-6xl mx-auto">
+                            {renderContent()}
+                        </div>
+                    </main>
+                </div>
+            );
+        }
+
+        // Mount App
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
