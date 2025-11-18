@@ -1,0 +1,6 @@
+- id: c1
+  title: Zero-Waste Logistics
+  context: High-speed fulfillment center with mixed human-robot traffic.
+  solutionGoal: Reduce misplaced inventory by 99% using autonomous sorting.
+  missionIds: 
+    - m1
