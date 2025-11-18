@@ -1,0 +1,7 @@
+- id: m1
+  title: Autonomous Inventory Management
+  robotPlatform: Mobile Manipulator (AGV+Arm)
+  description: Continuous patrol and organization of warehouse stock.
+  taskPlotIds: 
+    - tp1
+    - tp2
