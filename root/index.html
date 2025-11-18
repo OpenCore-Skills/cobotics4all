@@ -33,15 +33,26 @@
             background: #94a3b8; 
         }
     </style>
+
+    <!-- CRITICAL FIX: Import Map to ensure Single React Instance -->
+    <script type="importmap">
+    {
+        "imports": {
+            "react": "https://esm.sh/react@18.2.0",
+            "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+            "lucide-react": "https://esm.sh/lucide-react@0.292.0?deps=react@18.2.0,react-dom@18.2.0"
+        }
+    }
+    </script>
 </head>
 <body class="bg-slate-100 text-slate-900">
     <div id="root"></div>
 
     <!-- React App -->
     <script type="text/babel" data-type="module">
-        // 2. Fix: Updated Import URLs for better compatibility
-        import React, { useState } from 'https://esm.sh/react@18.2.0?dev';
-        import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client?dev';
+        // Now we import from the "names" defined in the importmap above
+        import React, { useState } from 'react';
+        import { createRoot } from 'react-dom/client';
         import { 
             Layout, 
             Target, 
@@ -57,7 +68,7 @@
             BookOpen, 
             ChevronRight, 
             Cpu 
-        } from 'https://esm.sh/lucide-react@0.292.0';
+        } from 'lucide-react';
 
         // --- Mock Data ---
         const initialSkills = [
