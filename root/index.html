@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cobotics4All - Asset Umbrella</title>
     
+    <!-- 1. Fix: Define process.env to prevent React crashes -->
+    <script>
+        window.process = { env: { NODE_ENV: 'production' } };
+    </script>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -34,8 +39,9 @@
 
     <!-- React App -->
     <script type="text/babel" data-type="module">
-        import React, { useState } from 'https://esm.sh/react@18.2.0';
-        import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
+        // 2. Fix: Updated Import URLs for better compatibility
+        import React, { useState } from 'https://esm.sh/react@18.2.0?dev';
+        import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client?dev';
         import { 
             Layout, 
             Target, 
@@ -51,7 +57,7 @@
             BookOpen, 
             ChevronRight, 
             Cpu 
-        } from 'https://esm.sh/lucide-react@0.263.1';
+        } from 'https://esm.sh/lucide-react@0.292.0';
 
         // --- Mock Data ---
         const initialSkills = [
